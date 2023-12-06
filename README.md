@@ -1,3 +1,5 @@
 # GrafanaAgents
 
-Stuff located in snmp/flow contains configs for the flow mode, i also currently have a config for static mode there 
+This repo is dedicated to keeping a collection of common configs for Grafana Agents.
+
+
