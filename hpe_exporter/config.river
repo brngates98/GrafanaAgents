@@ -1,0 +1,77 @@
+prometheus.scrape "hpe_array_exporter" {
+    targets = [{
+        __address__ = "hpe-array-exporter.nimble01.svc.cluster.local:9090",
+        array       = "TMG-Nimble01",
+    }]
+    forward_to = [prometheus.relabel.hpe_array_exporter.receiver]
+    job_name   = "hpe-array-exporter"
+}
+
+prometheus.scrape "hpe_array_exporter2" {
+    targets = [{
+        __address__ = "hpe-array-exporter.nimble02.svc.cluster.local:9090",
+        array       = "TMG-Nimble02",
+    }]
+    forward_to = [prometheus.relabel.hpe_array_exporter2.receiver]
+    job_name   = "hpe-array-exporter2"
+}
+
+prometheus.relabel "hpe_array_exporter" {
+    forward_to = [prometheus.remote_write.default.receiver]
+
+    rule {
+        source_labels = ["__name__"]
+        regex         = "cpg|pool"
+        replacement   = "storagepool"
+        action        = "labelmap"
+    }
+
+    rule {
+        source_labels = ["__name__"]
+        regex         = "^hpe(primera|nimble|3par|alletra6000|alletra9000)_(.*)"
+        target_label  = "__name__"
+        replacement   = "hpe_$2"
+    }
+
+    rule {
+        source_labels = ["__name__"]
+        regex         = "^hpe_(pool|cpg)_(.*)"
+        target_label  = "__name__"
+        replacement   = "hpe_storagepool_$2"
+    }
+}
+
+prometheus.relabel "hpe_array_exporter2" {
+    forward_to = [prometheus.remote_write.default.receiver]
+
+    rule {
+        source_labels = ["__name__"]
+        regex         = "cpg|pool"
+        replacement   = "storagepool"
+        action        = "labelmap"
+    }
+
+    rule {
+        source_labels = ["__name__"]
+        regex         = "^hpe(primera|nimble|3par|alletra6000|alletra9000)_(.*)"
+        target_label  = "__name__"
+        replacement   = "hpe_$2"
+    }
+
+    rule {
+        source_labels = ["__name__"]
+        regex         = "^hpe_(pool|cpg)_(.*)"
+        target_label  = "__name__"
+        replacement   = "hpe_storagepool_$2"
+    }
+}
+
+prometheus.remote_write "default" {
+    endpoint {
+        url = "https://mimir/api/v1/push"
+
+        queue_config { }
+
+        metadata_config { }
+    }
+}
