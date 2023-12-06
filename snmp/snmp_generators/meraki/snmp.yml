@@ -1,0 +1,87 @@
+# WARNING: This file was auto-generated using snmp_exporter generator, manual changes will be lost.
+auths:
+  meraki:
+    community: XXXX
+    security_level: noAuthNoPriv
+    auth_protocol: MD5
+    priv_protocol: DES
+    version: 2
+modules:
+  MERAKI-CLOUD-CONTROLLER-MIB:
+    walk:
+    - 1.3.6.1.4.1.29671.1.1.2
+    - 1.3.6.1.4.1.29671.1.1.4.1.1
+    - 1.3.6.1.4.1.29671.1.1.4.1.11
+    - 1.3.6.1.4.1.29671.1.1.4.1.2
+    - 1.3.6.1.4.1.29671.1.1.4.1.3
+    - 1.3.6.1.4.1.29671.1.1.4.1.5
+    metrics:
+    - name: networkId
+      oid: 1.3.6.1.4.1.29671.1.1.2.1.1
+      type: OctetString
+      help: Network id, consists of 8 octets - 1.3.6.1.4.1.29671.1.1.2.1.1
+      indexes:
+      - labelname: networkId
+        type: OctetString
+    - name: networkName
+      oid: 1.3.6.1.4.1.29671.1.1.2.1.2
+      type: DisplayString
+      help: Network name. - 1.3.6.1.4.1.29671.1.1.2.1.2
+      indexes:
+      - labelname: networkId
+        type: OctetString
+    - name: networkAdmin
+      oid: 1.3.6.1.4.1.29671.1.1.2.1.3
+      type: DisplayString
+      help: Name and email of a network admin. - 1.3.6.1.4.1.29671.1.1.2.1.3
+      indexes:
+      - labelname: networkId
+        type: OctetString
+    - name: vpnPeer
+      oid: 1.3.6.1.4.1.29671.1.1.2.1.4
+      type: InetAddressIPv4
+      help: IP and port of a VPN peer connected to the network. - 1.3.6.1.4.1.29671.1.1.2.1.4
+      indexes:
+      - labelname: networkId
+        type: OctetString
+    - name: devMac
+      oid: 1.3.6.1.4.1.29671.1.1.4.1.1
+      type: PhysAddress48
+      help: The MAC address of the device. - 1.3.6.1.4.1.29671.1.1.4.1.1
+      indexes:
+      - labelname: devMac
+        type: PhysAddress48
+    - name: devNetworkName
+      oid: 1.3.6.1.4.1.29671.1.1.4.1.11
+      type: DisplayString
+      help: The name of the network this device is in - 1.3.6.1.4.1.29671.1.1.4.1.11
+      indexes:
+      - labelname: devMac
+        type: PhysAddress48
+    - name: devName
+      oid: 1.3.6.1.4.1.29671.1.1.4.1.2
+      type: DisplayString
+      help: Device name. - 1.3.6.1.4.1.29671.1.1.4.1.2
+      indexes:
+      - labelname: devMac
+        type: PhysAddress48
+    - name: devStatus
+      oid: 1.3.6.1.4.1.29671.1.1.4.1.3
+      type: gauge
+      help: The status of the device's connection to the Meraki Cloud Controller -
+        1.3.6.1.4.1.29671.1.1.4.1.3
+      indexes:
+      - labelname: devMac
+        type: PhysAddress48
+      enum_values:
+        0: offline
+        1: online
+    - name: devClientCount
+      oid: 1.3.6.1.4.1.29671.1.1.4.1.5
+      type: gauge
+      help: The number of clients currently associated with the device. - 1.3.6.1.4.1.29671.1.1.4.1.5
+      indexes:
+      - labelname: devMac
+        type: PhysAddress48
+    max_repetitions: 25
+    retries: 3
