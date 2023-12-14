@@ -1,7 +1,7 @@
 prometheus.scrape "hpe_array_exporter" {
     targets = [{
         __address__ = "hpe-array-exporter.nimble01.svc.cluster.local:9090",
-        array       = "TMG-Nimble01",
+        array       = "Nimble01",
     }]
     forward_to = [prometheus.relabel.hpe_array_exporter.receiver]
     job_name   = "hpe-array-exporter"
@@ -10,7 +10,7 @@ prometheus.scrape "hpe_array_exporter" {
 prometheus.scrape "hpe_array_exporter2" {
     targets = [{
         __address__ = "hpe-array-exporter.nimble02.svc.cluster.local:9090",
-        array       = "TMG-Nimble02",
+        array       = "Nimble02",
     }]
     forward_to = [prometheus.relabel.hpe_array_exporter2.receiver]
     job_name   = "hpe-array-exporter2"
