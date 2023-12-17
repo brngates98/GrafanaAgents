@@ -1,0 +1,1 @@
+this snmp.yml was generated for the MERAKI-CLOUD-CONTROLLER-MIB

@@ -1,0 +1,1 @@
+SNMP.yml for IF-MIB with public auth

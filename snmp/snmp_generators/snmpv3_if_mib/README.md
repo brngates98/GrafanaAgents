@@ -1,0 +1,1 @@
+snmp.yml for SNMPv3 
