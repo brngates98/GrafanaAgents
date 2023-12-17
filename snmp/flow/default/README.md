@@ -1,4 +1,4 @@
-SNMP v2 using IF_MIB
+SNMP v2 using IF_MIB with a community string of public
 
 Take note:
 
