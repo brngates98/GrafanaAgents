@@ -1,0 +1,19 @@
+acceptEula: true
+arraySecret: hpe-backend
+image:
+  pullPolicy: IfNotPresent
+  registry: quay.io
+logLevel: info
+metrics:
+  disableIntrospection: false
+service:
+  annotations: {}
+  labels: {}
+  port: 9090
+  type: ClusterIP
+serviceMonitor:
+  enable: false
+  targetLabels: []
+global:
+  cattle:
+    systemProjectId: p-dkrnd
