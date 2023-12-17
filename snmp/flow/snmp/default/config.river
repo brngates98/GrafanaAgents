@@ -1,0 +1,53 @@
+prometheus.remote_write "metrics_integrations" {
+    endpoint {
+        name = "integrations-fd111a"
+        url  = "https://mimir/api/v1/push"
+
+        queue_config { }
+
+        metadata_config { }
+    }
+}
+
+prometheus.exporter.snmp "integrations_snmp" {
+
+    target "EXAMPLE_01" {
+        address = "192.168.1.1"
+        module  = "if_mib"
+        auth    = "public"
+    }
+
+}
+
+discovery.relabel "integrations_snmp" {
+    targets = prometheus.exporter.snmp.integrations_snmp.targets
+
+    rule {
+        source_labels = ["job"]
+        regex         = "(^.*snmp)\\/(.*)"
+        target_label  = "job_snmp"
+    }
+
+    rule {
+        source_labels = ["job"]
+        regex         = "(^.*snmp)\\/(.*)"
+        target_label  = "snmp_target"
+        replacement   = "$2"
+    }
+}
+
+prometheus.scrape "integrations_snmp" {
+    targets    = discovery.relabel.integrations_snmp.output
+    forward_to = [prometheus.remote_write.integrations.receiver]
+    job_name   = "integrations/snmp"
+}
+
+prometheus.remote_write "integrations" {
+    endpoint {
+        url = "https://mimir/api/v1/push"
+
+        queue_config { }
+
+        metadata_config { }
+    }
+}
