@@ -14,11 +14,11 @@ agent:
     - name: syslog-udp
       port: 514
       protocol: UDP
-      targetPort: 51898
+      targetPort: 514
     - name: syslog-tcp
       port: 601
       protocol: TCP
-      targetPort: 51893
+      targetPort: 601
   listenAddr: 0.0.0.0
   listenPort: 80
   mode: flow
