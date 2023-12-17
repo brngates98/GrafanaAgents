@@ -1,0 +1,30 @@
+integrations:
+  prometheus_remote_write:
+  - url: http://prometheus/api/v1/write
+  snmp:
+    enabled: true
+    config_file: /etc/snmp.yml
+    relabel_configs:
+      - action: replace
+        source_labels: [job]
+        regex: (^.*snmp)\/(.*)
+        target_label: job_snmp_meraki
+        replacement: $1
+      - action: replace
+        source_labels: [job]
+        regex: (^.*snmp)\/(.*)
+        target_label: snmp_target
+        replacement: $2
+    snmp_targets:
+      - name: Example01
+        address: '192.168.1.1'
+        module: if_mib
+        auth: private_v3
+metrics:
+  configs:
+  - name: integrations
+    remote_write:
+    - url: http://prometheus/api/v1/write
+    scrape_configs:
+  global:
+    scrape_interval: 60s

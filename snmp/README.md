@@ -1,6 +1,11 @@
-This directory contains different agent configs for collecting SNMP Metrics:
+This directory contains different agent configs for collecting SNMP 
+Mimir - these agents are configured to send metrics to mimir
 
+Prometheus - These agents are configured to send to prometheus 
 
+Special note for prometheus you need the  --web.enable-remote-write-receiver flag enabled
+
+Metrics:
 The built-in snmp.yml for the grafana agent is:
 https://github.com/grafana/agent/blob/main/pkg/integrations/snmp_exporter/common/snmp.yml
 

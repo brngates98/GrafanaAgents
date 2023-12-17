@@ -1,0 +1,54 @@
+prometheus.remote_write "metrics_integrations" {
+    endpoint {
+        name = "integrations-fd111a"
+        url  = "http://prometheus/api/v1/write"
+
+        queue_config { }
+
+        metadata_config { }
+    }
+}
+
+prometheus.exporter.snmp "integrations_snmp" {
+    config_file = "/etc/snmp.yml"
+
+    target "EXAMPLE_01" {
+        address = "192.168.1.1"
+        module  = "if_mib"
+        auth    = "private_v3"
+    }
+
+}
+
+discovery.relabel "integrations_snmp" {
+    targets = prometheus.exporter.snmp.integrations_snmp.targets
+
+    rule {
+        source_labels = ["job"]
+        regex         = "(^.*snmp)\\/(.*)"
+        target_label  = "job_snmp"
+    }
+
+    rule {
+        source_labels = ["job"]
+        regex         = "(^.*snmp)\\/(.*)"
+        target_label  = "snmp_target"
+        replacement   = "$2"
+    }
+}
+
+prometheus.scrape "integrations_snmp" {
+    targets    = discovery.relabel.integrations_snmp.output
+    forward_to = [prometheus.remote_write.integrations.receiver]
+    job_name   = "integrations/snmp"
+}
+
+prometheus.remote_write "integrations" {
+    endpoint {
+        url  = "http://prometheus/api/v1/write"
+
+        queue_config { }
+
+        metadata_config { }
+    }
+}
