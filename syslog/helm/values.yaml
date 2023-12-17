@@ -1,0 +1,125 @@
+agent:
+  clustering:
+    enabled: false
+  configMap:
+    content: ''
+    create: false
+    key: null
+    name: syslog-grafana-agent
+  enableReporting: true
+  envFrom: []
+  extraArgs: []
+  extraEnv: []
+  extraPorts:
+    - name: syslog-udp
+      port: 514
+      protocol: UDP
+      targetPort: 51898
+    - name: syslog-tcp
+      port: 601
+      protocol: TCP
+      targetPort: 51893
+  listenAddr: 0.0.0.0
+  listenPort: 80
+  mode: flow
+  mounts:
+    dockercontainers: false
+    extra: []
+    varlog: false
+  resources:
+    limits:
+      cpu: 500m
+      memory: 128Mi
+    requests:
+      cpu: 250m
+      memory: 70Mi
+  securityContext: {}
+  storagePath: /tmp/agent
+  uiPathPrefix: /
+configReloader:
+  customArgs: []
+  enabled: true
+  image:
+    digest: ''
+    registry: docker.io
+    repository: jimmidyson/configmap-reload
+    tag: v0.8.0
+  resources:
+    requests:
+      cpu: 1m
+      memory: 5Mi
+  securityContext: {}
+controller:
+  affinity: {}
+  autoscaling:
+    enabled: false
+    maxReplicas: 5
+    minReplicas: 1
+    targetCPUUtilizationPercentage: 0
+    targetMemoryUtilizationPercentage: 80
+  dnsPolicy: ClusterFirst
+  enableStatefulSetAutoDeletePVC: false
+  extraAnnotations: {}
+  hostNetwork: false
+  hostPID: false
+  initContainers: []
+  nodeSelector: {}
+  parallelRollout: true
+  podAnnotations: {}
+  podLabels: {}
+  priorityClassName: ''
+  replicas: 1
+  tolerations: []
+  type: daemonset
+  updateStrategy: {}
+  volumeClaimTemplates: []
+  volumes:
+    extra: []
+crds:
+  create: true
+fullnameOverride: null
+global:
+  image:
+    pullSecrets: []
+    registry: ''
+  podSecurityContext: {}
+  cattle:
+    systemProjectId: p-dkrnd
+image:
+  digest: null
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+  registry: docker.io
+  repository: grafana/agent
+  tag: null
+ingress:
+  annotations: {}
+  enabled: true
+  extraPaths: []
+  faroPort: 80
+  hosts:
+    - syslog.agents.k3-prod.thetmg.com
+  labels: {}
+  path: /
+  pathType: Prefix
+  tls: []
+  ingressClassName: nginx
+nameOverride: null
+rbac:
+  create: true
+service:
+  annotations: {}
+  clusterIP: ''
+  enabled: true
+  type: LoadBalancer
+  loadBalancerIP: 192.168.70.111
+serviceAccount:
+  annotations: {}
+  create: true
+  name: null
+serviceMonitor:
+  additionalLabels: {}
+  enabled: false
+  interval: ''
+  metricRelabelings: []
+  relabelings: []
