@@ -4,4 +4,4 @@ Take note:
 
 Mimir remote_write: https://mimir/api/v1/push
 
-Prometheusremote_write: https://prom/api/prom/push
+Prometheusremote_write: https://prom/api/v1/write
