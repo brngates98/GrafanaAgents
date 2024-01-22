@@ -10,10 +10,17 @@ https://github.com/brngates98/GrafanaAgents/blob/main/snmp/snmp_generators/snmpv
 
 #### i like to place snmp.yml in /etc/snmp.yml but it can go wherever as long as you define the location in the agent config file.
 
-# Static Mode
-Here is the grafana agent config template for static mode: https://github.com/brngates98/GrafanaAgents/blob/main/snmp/mimir/static/snmp/grafana-agent.yaml
-# Flow Mode
+### The only difference in mimir or prometheus endpoint is the remote_write url 
+
+# Static Mode for Mimir
+ Here is the grafana agent config template for static mode: https://github.com/brngates98/GrafanaAgents/blob/main/snmp/mimir/static/snmp/grafana-agent.yaml
+# Flow Mode for Mimir
 Here is the grafana agent config template for flow mode: https://github.com/brngates98/GrafanaAgents/blob/main/snmp/mimir/flow/snmpv3/config.river
+
+# Static Mode for Prometheus
+ Here is the grafana agent config template for static mode: https://github.com/brngates98/GrafanaAgents/blob/main/snmp/prometheus/static/snmp/grafana-agent.yaml
+# Flow Mode for Prometheus
+Here is the grafana agent config template for flow mode: https://github.com/brngates98/GrafanaAgents/blob/main/snmp/prometheus/flow/snmpv3/config.river
 
 
 If you have any issues feel free to email me brian@briangates.tech
