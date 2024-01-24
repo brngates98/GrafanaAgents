@@ -2,7 +2,7 @@ This will contain the values.yaml for grafana-k8s-monitoring helm chart.
 
 The values.yaml posted here is built to work with Mimir and Loki On-Prem and not grafana cloud as they use different endpoints
 
-# How to install 
+# How to install the Kubernetes Monitoring Grafana Agent
 
 ```
 helm repo add grafana https://grafana.github.io/helm-charts &&
