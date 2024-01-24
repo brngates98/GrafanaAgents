@@ -20,7 +20,7 @@ externalServices:
       username: "USERNAME"
       password: PASSWORD
   loki:
-    host: https://logs.yourdomain.com
+    host: https://loki.yourdomain.com
     queryEndpoint: /loki/api/v1/query
     writeEndpoint: /loki/api/v1/push
     basicAuth:
