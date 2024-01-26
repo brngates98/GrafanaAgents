@@ -1,4 +1,4 @@
-integrations-kubernetes:
+groups:
     - name: kubernetes-apps
       rules:
         - alert: KubePodCrashLooping
