@@ -2,13 +2,15 @@ This will contain the values.yaml for grafana-k8s-monitoring helm chart.
 
 The values.yaml posted here is built to work with Mimir and Loki On-Prem and not grafana cloud as they use different endpoints
 
+This read me will contain various snippets for OSS and Grafana Cloud
+
 # How to install the Kubernetes Monitoring Grafana Agent
 
 # Mimir/Loki OSS - Metrics/Logs Only
 ```
 helm repo add grafana https://grafana.github.io/helm-charts &&
   helm repo update &&
-  helm upgrade --install --atomic --timeout 120s grafana-k8s-monitoring grafana/k8s-monitoring \
+  helm upgrade --install --atomic --timeout 300s grafana-k8s-monitoring grafana/k8s-monitoring \
     --namespace "default" --create-namespace --values - <<EOF
 cluster:
   name: my-cluster
@@ -27,7 +29,22 @@ externalServices:
     basicAuth:
       username: "USERNAME"
       password: PASSWORD
+metrics:
+  enabled: true
+  cost:
+    enabled: true
+  node-exporter:
+    enabled: true
+logs:
+  enabled: true
+  pod_logs:
+    enabled: true
+  cluster_events:
+    enabled: true
+traces:
+  enabled: false
 opencost:
+  enabled: true
   opencost:
     exporter:
       defaultClusterId: my-cluster
