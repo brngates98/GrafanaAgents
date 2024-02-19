@@ -7,6 +7,7 @@ This read me will contain various snippets for OSS and Grafana Cloud
 # How to install the Kubernetes Monitoring Grafana Agent
 
 # Mimir/Loki OSS - Metrics/Logs Only
+Replace "my-cluster" with youre cluster name
 ```
 helm repo add grafana https://grafana.github.io/helm-charts &&
   helm repo update &&
