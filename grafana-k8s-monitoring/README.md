@@ -63,7 +63,7 @@ grafana-agent-logs: {}
 EOF
 ```
 
-# Grafana Cloud - Metrics/Logs/Traces
+# Grafana Cloud - Metrics/Logs
 ```
 helm repo add grafana https://grafana.github.io/helm-charts &&
   helm repo update &&
