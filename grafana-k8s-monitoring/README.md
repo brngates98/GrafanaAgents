@@ -73,19 +73,14 @@ cluster:
   name: my-cluster
 externalServices:
   prometheus:
-    host: https://prometheus-prod-13-prod-us-east-0.grafana.ne
+    host: https://prometheus-prod-13-prod-us-east-0.grafana.net
     basicAuth:
-      username: "USERNAME"
+      username: "username"
       password: REPLACE_WITH_ACCESS_POLICY_TOKEN
   loki:
     host: https://logs-prod-006.grafana.net
     basicAuth:
-      username: "USERNAME"
-      password: REPLACE_WITH_ACCESS_POLICY_TOKEN
-  tempo:
-    host: https://tempo-prod-04-prod-us-east-0.grafana.net:443
-    basicAuth:
-      username: "USERNAME"
+      username: "username"
       password: REPLACE_WITH_ACCESS_POLICY_TOKEN
 metrics:
   enabled: true
@@ -100,7 +95,7 @@ logs:
   cluster_events:
     enabled: true
 traces:
-  enabled: true
+  enabled: false
 opencost:
   enabled: true
   opencost:
