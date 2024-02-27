@@ -14,22 +14,22 @@ helm repo add grafana https://grafana.github.io/helm-charts &&
   helm upgrade --install --atomic --timeout 300s grafana-k8s-monitoring grafana/k8s-monitoring \
     --namespace "default" --create-namespace --values - <<EOF
 cluster:
-  name: my-cluster
+  name: rke2-tmg
 externalServices:
   prometheus:
-    host: https://mimir.yourdomain.com
+    host: https://mimir.thetmg.com
     queryEndpoint: /api/v1/query
     writeEndpoint: /api/v1/push
     basicAuth:
-      username: "USERNAME"
-      password: PASSWORD
+      username: "1083092"
+      password: REPLACE_WITH_ACCESS_POLICY_TOKEN
   loki:
-    host: https://loki.yourdomain.com
+    host: https://logs.thetmg.com
     queryEndpoint: /loki/api/v1/query
     writeEndpoint: /loki/api/v1/push
     basicAuth:
-      username: "USERNAME"
-      password: PASSWORD
+      username: "642165"
+      password: REPLACE_WITH_ACCESS_POLICY_TOKEN
 metrics:
   enabled: true
   cost:
@@ -48,10 +48,10 @@ opencost:
   enabled: true
   opencost:
     exporter:
-      defaultClusterId: my-cluster
+      defaultClusterId: rke2-tmg
     prometheus:
       external:
-        url: https://mimir.yourdomain.com
+        url: https://mimir.thetmg.com
 kube-state-metrics:
   enabled: true
 prometheus-node-exporter:
