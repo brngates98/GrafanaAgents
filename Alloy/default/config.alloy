@@ -1,0 +1,53 @@
+prometheus.exporter.self "integrations_alloy" { }
+
+discovery.relabel "integrations_alloy" {
+  targets = prometheus.exporter.self.integrations_alloy.targets
+
+  rule {
+    target_label = "instance"
+    replacement  = constants.hostname
+  }
+
+  rule {
+    target_label = "alloy_hostname"
+    replacement  = constants.hostname
+  }
+
+  rule {
+    target_label = "job"
+    replacement  = "integrations/alloy-check"
+  }
+}
+
+prometheus.scrape "integrations_alloy" {
+  targets    = discovery.relabel.integrations_alloy.output
+  forward_to = [prometheus.relabel.integrations_alloy.receiver]  
+
+  scrape_interval = "60s"
+}
+
+prometheus.relabel "integrations_alloy" {
+  forward_to = [prometheus.remote_write.metrics_service.receiver]
+
+  rule {
+    source_labels = ["__name__"]
+    regex         = "(prometheus_target_sync_length_seconds_sum|prometheus_target_scrapes_.*|prometheus_target_interval.*|prometheus_sd_discovered_targets|alloy_build.*|prometheus_remote_write_wal_samples_appended_total|process_start_time_seconds)"
+    action        = "keep"
+  }
+}
+
+
+
+prometheus.remote_write "metrics_service" {
+  endpoint {
+    url = "https://mimir/api/v1/push"
+
+  }
+}
+
+loki.write "grafana_cloud_loki" {
+  endpoint {
+    url = "https://logs/loki/api/v1/push"
+
+  }
+}
