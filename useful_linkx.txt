@@ -1,0 +1,3 @@
+this is a file for my own tracking of links, currently transitioning between systems and a bunch of other crap
+
+https://github.com/grafana/grafana-plugin-examples
