@@ -1,0 +1,98 @@
+prometheus.exporter.self "integrations_alloy" { }
+
+discovery.relabel "integrations_alloy" {
+  targets = prometheus.exporter.self.integrations_alloy.targets
+
+  rule {
+    target_label = "instance"
+    replacement  = constants.hostname
+  }
+
+  rule {
+    target_label = "alloy_hostname"
+    replacement  = constants.hostname
+  }
+
+  rule {
+    target_label = "job"
+    replacement  = "integrations/alloy-check"
+  }
+}
+
+prometheus.scrape "integrations_alloy" {
+  targets    = discovery.relabel.integrations_alloy.output
+  forward_to = [prometheus.relabel.integrations_alloy.receiver]  
+
+  scrape_interval = "60s"
+}
+
+prometheus.relabel "integrations_alloy" {
+  forward_to = [prometheus.remote_write.metrics_service.receiver]
+
+  rule {
+    source_labels = ["__name__"]
+    regex         = "(prometheus_target_sync_length_seconds_sum|prometheus_target_scrapes_.*|prometheus_target_interval.*|prometheus_sd_discovered_targets|alloy_build.*|prometheus_remote_write_wal_samples_appended_total|process_start_time_seconds)"
+    action        = "keep"
+  }
+}
+
+prometheus.exporter.windows "integrations_windows_exporter" {
+	enabled_collectors = ["iis"]
+
+	dfsr {
+		sources_enabled = [""]
+	}
+
+	exchange {
+		enabled_list = [""]
+	}
+
+	mssql {
+		enabled_classes = [""]
+	}
+}
+
+discovery.relabel "integrations_windows_exporter" {
+	targets = prometheus.exporter.windows.integrations_windows_exporter.targets
+
+	rule {
+		target_label = "job"
+		replacement  = "integrations/iis"
+	}
+
+	rule {
+		target_label = "instance"
+		replacement  = constants.hostname
+	}
+}
+
+prometheus.scrape "integrations_windows_exporter" {
+	targets    = discovery.relabel.integrations_windows_exporter.output
+	forward_to = [prometheus.relabel.integrations_windows_exporter.receiver]
+	job_name   = "integrations/windows_exporter"
+}
+
+prometheus.relabel "integrations_windows_exporter" {
+	forward_to = [prometheus.remote_write.metrics_service.receiver]
+
+	rule {
+		source_labels = ["__name__"]
+		regex         = "up|windows_iis_blocked_async_io_requests_total|windows_iis_connection_attempts_all_instances_total|windows_iis_current_application_pool_state|windows_iis_current_connections|windows_iis_current_worker_processes|windows_iis_files_received_total|windows_iis_files_sent_total|windows_iis_locked_errors_total|windows_iis_not_found_errors_total|windows_iis_received_bytes_total|windows_iis_rejected_async_io_requests_total|windows_iis_requests_total|windows_iis_sent_bytes_total|windows_iis_server_file_cache_hits_total|windows_iis_server_file_cache_queries_total|windows_iis_server_metadata_cache_hits_total|windows_iis_server_metadata_cache_queries_total|windows_iis_server_output_cache_hits_total|windows_iis_server_output_cache_queries_total|windows_iis_server_uri_cache_hits_total|windows_iis_server_uri_cache_queries_total|windows_iis_total_worker_process_failures|windows_iis_total_worker_process_ping_failures|windows_iis_total_worker_process_shutdown_failures|windows_iis_total_worker_process_startup_failures|windows_iis_worker_file_cache_hits_total|windows_iis_worker_file_cache_queries_total|windows_iis_worker_max_threads|windows_iis_worker_metadata_cache_hits_total|windows_iis_worker_metadata_cache_queries_total|windows_iis_worker_output_cache_hits_total|windows_iis_worker_output_queries_total|windows_iis_worker_request_errors_total|windows_iis_worker_requests_total|windows_iis_worker_threads|windows_iis_worker_uri_cache_hits_total|windows_iis_worker_uri_cache_queries_total|windows_iis_worker_websocket_connection_accepted_total|windows_iis_worker_websocket_connection_attempts_total"
+		action        = "keep"
+	}
+}
+
+
+prometheus.remote_write "metrics_service" {
+  endpoint {
+    url = "https://mimir/api/v1/push"
+
+  }
+}
+
+loki.write "grafana_cloud_loki" {
+  endpoint {
+    url = "https://logs/loki/api/v1/push"
+
+  }
+}
