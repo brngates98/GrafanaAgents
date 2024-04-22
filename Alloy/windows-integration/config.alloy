@@ -37,135 +37,109 @@ prometheus.relabel "integrations_alloy" {
 }
 
 prometheus.exporter.windows "integrations_windows_exporter" {
-	enabled_collectors = ["ad", "cpu", "cs", "logical_disk", "net", "os", "service", "system", "time", "diskdrive"]
-
-	dfsr {
-		sources_enabled = [""]
-	}
-
-	exchange {
-		enabled_list = [""]
-	}
-
-	mssql {
-		enabled_classes = [""]
-	}
+  enabled_collectors = ["cpu", "cs", "logical_disk", "net", "os", "service", "system", "time", "diskdrive"]
 }
-
 discovery.relabel "integrations_windows_exporter" {
-	targets = prometheus.exporter.windows.integrations_windows_exporter.targets
+  targets = prometheus.exporter.windows.integrations_windows_exporter.targets
 
-	rule {
-		target_label = "job"
-		replacement  = "integrations/windows_exporter"
-	}
+  rule {
+    target_label = "job"
+    replacement  = "integrations/windows_exporter"
+  }
 
-	rule {
-		target_label = "instance"
-		replacement  = constants.hostname
-	}
+  rule {
+    target_label = "instance"
+    replacement  = constants.hostname
+  }
 }
-
 prometheus.scrape "integrations_windows_exporter" {
-	targets    = discovery.relabel.integrations_windows_exporter.output
-	forward_to = [prometheus.relabel.integrations_windows_exporter.receiver]
-	job_name   = "integrations/windows_exporter"
+  targets    = discovery.relabel.integrations_windows_exporter.output
+  forward_to = [prometheus.relabel.integrations_windows_exporter.receiver]
+  job_name   = "integrations/windows_exporter"
 }
-
 prometheus.relabel "integrations_windows_exporter" {
-	forward_to = [prometheus.remote_write.metrics_service.receiver]
+  forward_to = [prometheus.remote_write.metrics_service.receiver]
 
-	rule {
-		source_labels = ["volume"]
-		regex         = "HarddiskVolume.*"
-		action        = "drop"
-	}
-
-	rule {
-		source_labels = ["__name__"]
-		regex         = "up|windows_ad_binds_total|windows_ad_database_operations_total|windows_ad_directory_operations_total|windows_ad_directory_service_threads|windows_ad_replication_data_intersite_bytes_total|windows_ad_replication_data_intrasite_bytes_total|windows_ad_replication_inbound_objects_updated_total|windows_ad_replication_inbound_properties_updated_total|windows_ad_replication_pending_operations|windows_ad_replication_pending_synchronizations|windows_ad_replication_sync_requests_schema_mismatch_failure_total|windows_ad_sam_password_changes_total|windows_cpu_interrupts_total|windows_cpu_time_total|windows_cs_hostname|windows_cs_logical_processors|windows_cs_physical_memory_bytes|windows_disk_drive_status|windows_logical_disk_avg_read_requests_queued|windows_logical_disk_avg_write_requests_queued|windows_logical_disk_free_bytes|windows_logical_disk_idle_seconds_total|windows_logical_disk_read_bytes_total|windows_logical_disk_read_seconds_total|windows_logical_disk_reads_total|windows_logical_disk_size_bytes|windows_logical_disk_write_bytes_total|windows_logical_disk_write_seconds_total|windows_logical_disk_writes_total|windows_net_bytes_received_total|windows_net_bytes_sent_total|windows_net_packets_outbound_discarded_total|windows_net_packets_outbound_errors_total|windows_net_packets_received_discarded_total|windows_net_packets_received_errors_total|windows_net_packets_received_unknown_total|windows_os_info|windows_os_paging_limit_bytes|windows_os_physical_memory_free_bytes|windows_os_timezone|windows_service_status|windows_system_context_switches_total|windows_system_processor_queue_length|windows_system_system_up_time|windows_time_computed_time_offset_seconds|windows_time_ntp_round_trip_delay_seconds"
-		action        = "keep"
-	}
+  rule {
+    action        = "keep"
+    regex         = "(up|windows_cpu_interrupts_total|windows_cpu_time_total|windows_cs_hostname|windows_cs_logical_processors|windows_cs_physical_memory_bytes|windows_disk_drive_status|windows_logical_disk_avg_read_requests_queued|windows_logical_disk_avg_write_requests_queued|windows_logical_disk_free_bytes|windows_logical_disk_idle_seconds_total|windows_logical_disk_read_bytes_total|windows_logical_disk_read_seconds_total|windows_logical_disk_reads_total|windows_logical_disk_size_bytes|windows_logical_disk_write_bytes_total|windows_logical_disk_write_seconds_total|windows_logical_disk_writes_total|windows_net_bytes_received_total|windows_net_bytes_sent_total|windows_net_packets_outbound_discarded_total|windows_net_packets_outbound_errors_total|windows_net_packets_received_discarded_total|windows_net_packets_received_errors_total|windows_net_packets_received_unknown_total|windows_os_info|windows_os_paging_limit_bytes|windows_os_physical_memory_free_bytes|windows_os_timezone|windows_service_status|windows_system_context_switches_total|windows_system_processor_queue_length|windows_system_system_up_time|windows_time_computed_time_offset_seconds|windows_time_ntp_round_trip_delay_seconds)"
+    source_labels = ["__name__"]
+  }
 }
 
-loki.process "logs_integrations_integrations_windows_exporter_application" {
-	forward_to = [loki.write.grafana_cloud_loki.receiver]
+loki.process "logs_integrations_windows_exporter_application" {
+  forward_to = [loki.write.grafana_cloud_loki.receiver]
 
-	stage.json {
-		expressions = {
-			level  = "levelText",
-			source = "source",
-		}
-	}
+  stage.json {
+    expressions = {
+      level  = "levelText",
+      source = "source",
+    }
+  }
 
-	stage.labels {
-		values = {
-			level  = null,
-			source = null,
-		}
-	}
+  stage.labels {
+    values = {
+      level  = "",
+      source = "",
+    }
+  }
 }
+loki.relabel "logs_integrations_windows_exporter_application" {
+  forward_to = [loki.process.logs_integrations_windows_exporter_application.receiver]
 
-loki.relabel "logs_integrations_integrations_windows_exporter_application" {
-	forward_to = [loki.process.logs_integrations_integrations_windows_exporter_application.receiver]
-
-	rule {
-		source_labels = ["computer"]
-		target_label  = "agent_hostname"
-	}
+  rule {
+    source_labels = ["computer"]
+    target_label  = "agent_hostname"
+  }
 }
-
-loki.source.windowsevent "logs_integrations_integrations_windows_exporter_application" {
-	locale                 = 1033
-	eventlog_name          = "Application"
-	bookmark_path          = "./bookmarks-app.xml"
-	poll_interval          = "0s"
-	use_incoming_timestamp = true
-	forward_to             = [loki.relabel.logs_integrations_integrations_windows_exporter_application.receiver]
-	labels                 = {
-		instance = constants.hostname,
-		job      = "integrations/windows_exporter",
-	}
+loki.source.windowsevent "logs_integrations_windows_exporter_application" {
+  locale                 = 1033
+  eventlog_name          = "Application"
+  bookmark_path          = "./bookmarks-app.xml"
+  poll_interval          = "0s"
+  use_incoming_timestamp = true
+  forward_to             = [loki.relabel.logs_integrations_windows_exporter_application.receiver]
+  labels                 = {
+    instance = constants.hostname,
+    job      = "integrations/windows_exporter",
+  }
 }
+loki.process "logs_integrations_windows_exporter_system" {
+  forward_to = [loki.write.grafana_cloud_loki.receiver]
 
-loki.process "logs_integrations_integrations_windows_exporter_system" {
-	forward_to = [loki.write.grafana_cloud_loki.receiver]
+  stage.json {
+    expressions = {
+      level  = "levelText",
+      source = "source",
+    }
+  }
 
-	stage.json {
-		expressions = {
-			level  = "levelText",
-			source = "source",
-		}
-	}
-
-	stage.labels {
-		values = {
-			level  = null,
-			source = null,
-		}
-	}
+  stage.labels {
+    values = {
+      level  = "",
+      source = "",
+    }
+  }
 }
+loki.relabel "logs_integrations_windows_exporter_system" {
+  forward_to = [loki.process.logs_integrations_windows_exporter_system.receiver]
 
-loki.relabel "logs_integrations_integrations_windows_exporter_system" {
-	forward_to = [loki.process.logs_integrations_integrations_windows_exporter_system.receiver]
-
-	rule {
-		source_labels = ["computer"]
-		target_label  = "agent_hostname"
-	}
+  rule {
+    source_labels = ["computer"]
+    target_label  = "agent_hostname"
+  }
 }
-
-loki.source.windowsevent "logs_integrations_integrations_windows_exporter_system" {
-	locale                 = 1033
-	eventlog_name          = "System"
-	bookmark_path          = "./bookmarks-sys.xml"
-	poll_interval          = "0s"
-	use_incoming_timestamp = true
-	forward_to             = [loki.relabel.logs_integrations_integrations_windows_exporter_system.receiver]
-	labels                 = {
-		instance = constants.hostname,
-		job      = "integrations/windows_exporter",
-	}
+loki.source.windowsevent "logs_integrations_windows_exporter_system" {
+  locale                 = 1033
+  eventlog_name          = "System"
+  bookmark_path          = "./bookmarks-sys.xml"
+  poll_interval          = "0s"
+  use_incoming_timestamp = true
+  forward_to             = [loki.relabel.logs_integrations_windows_exporter_system.receiver]
+  labels                 = {
+    instance = constants.hostname,
+    job      = "integrations/windows_exporter",
+  }
 }
 
 
