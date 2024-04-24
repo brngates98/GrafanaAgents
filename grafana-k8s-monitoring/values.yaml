@@ -1,98 +1,5 @@
-cluster:
-  kubernetesAPIService: kubernetes.default.svc.cluster.local:443
-  name: rke2-tmg
-  platform: ''
-configValidator:
-  extraAnnotations: {}
-  extraLabels: {}
-  nodeSelector:
-    kubernetes.io/os: linux
-  tolerations: []
-externalServices:
-  loki:
-    authMode: basic
-    basicAuth:
-      password: PASSWORD
-      passwordKey: password
-      username: 'USERNAME'
-      usernameKey: username
-    externalLabels: {}
-    host: https://logs.yourdomain.com
-    hostKey: host
-    proxyURL: ''
-    queryEndpoint: /loki/api/v1/query
-    secret:
-      create: true
-      name: ''
-      namespace: ''
-    tenantId: ''
-    tenantIdKey: tenantId
-    tls: {}
-    writeEndpoint: /loki/api/v1/push
-  prometheus:
-    authMode: basic
-    basicAuth:
-      password: PASSWORD
-      passwordKey: password
-      username: 'USERNAME'
-      usernameKey: username
-    externalLabels: {}
-    host: https://mimir.yourdomain.com
-    hostKey: host
-    processors:
-      batch:
-        maxSize: 0
-        size: 8192
-        timeout: 2s
-      memoryLimiter:
-        checkInterval: 1s
-        enabled: false
-        limit: 0MiB
-    protocol: remote_write
-    proxyURL: ''
-    queryEndpoint: /api/v1/query
-    secret:
-      create: true
-      name: ''
-      namespace: ''
-    tenantId: ''
-    tenantIdKey: tenantId
-    tls: {}
-    wal:
-      maxKeepaliveTime: 8h
-      minKeepaliveTime: 5m
-      truncateFrequency: 2h
-    writeEndpoint: /api/v1/push
-    writeRelabelConfigRules: ''
-  tempo:
-    authMode: basic
-    basicAuth:
-      password: ''
-      passwordKey: password
-      username: ''
-      usernameKey: username
-    host: ''
-    hostKey: host
-    protocol: otlp
-    searchEndpoint: /api/search
-    secret:
-      create: true
-      name: ''
-      namespace: ''
-    tenantId: ''
-    tenantIdKey: tenantId
-    tls: {}
-    tlsOptions: ''
-extraConfig: ''
-extraObjects: []
-global:
-  image:
-    pullSecrets: []
-    registry: ''
-  cattle:
-    systemProjectId: p-dkrnd
-grafana-agent:
-  agent:
+alloy:
+  alloy:
     clustering:
       enabled: true
     configMap:
@@ -145,20 +52,21 @@ grafana-agent:
           name: kubernetes-monitoring-telemetry
   crds:
     create: false
-grafana-agent-events:
-  agent:
+alloy-events:
+  alloy:
     configMap:
       create: false
   controller:
     nodeSelector:
       kubernetes.io/os: linux
+    replicas: 1
     type: deployment
   crds:
     create: false
-grafana-agent-logs:
-  agent:
+alloy-logs:
+  alloy:
     clustering:
-      enabled: true
+      enabled: false
     configMap:
       create: false
     mounts:
@@ -173,6 +81,162 @@ grafana-agent-logs:
     type: daemonset
   crds:
     create: false
+alloy-profiles:
+  alloy:
+    clustering:
+      enabled: false
+    configMap:
+      create: false
+    securityContext:
+      privileged: true
+      runAsGroup: 0
+      runAsUser: 0
+    stabilityLevel: public-preview
+  controller:
+    hostPID: true
+    nodeSelector:
+      kubernetes.io/os: linux
+    tolerations:
+      - effect: NoSchedule
+        operator: Exists
+    type: daemonset
+  crds:
+    create: false
+cluster:
+  kubernetesAPIService: kubernetes.default.svc.cluster.local:443
+  name: rke2-tmg
+  platform: ''
+configAnalysis:
+  enabled: true
+  extraAnnotations: {}
+  extraLabels: {}
+  image:
+    image: grafana/k8s-monitoring-test
+    pullSecrets: []
+    registry: ghcr.io
+    tag: ''
+  nodeSelector:
+    kubernetes.io/os: linux
+  tolerations: []
+configValidator:
+  enabled: true
+  extraAnnotations: {}
+  extraLabels: {}
+  nodeSelector:
+    kubernetes.io/os: linux
+  tolerations: []
+externalServices:
+  loki:
+    authMode: basic
+    basicAuth:
+      password: REPLACE_WITH_ACCESS_POLICY_TOKEN
+      passwordKey: password
+      username: '642165'
+      usernameKey: username
+    externalLabels: {}
+    host: https://logs.thetmg.com
+    hostKey: host
+    processors:
+      batch:
+        maxSize: 0
+        size: 8192
+        timeout: 2s
+      memoryLimiter:
+        checkInterval: 1s
+        enabled: false
+        limit: 0MiB
+    protocol: loki
+    proxyURL: ''
+    queryEndpoint: /loki/api/v1/query
+    secret:
+      create: true
+      name: ''
+      namespace: ''
+    tenantId: ''
+    tenantIdKey: tenantId
+    tls: {}
+    writeEndpoint: /loki/api/v1/push
+  prometheus:
+    authMode: basic
+    basicAuth:
+      password: REPLACE_WITH_ACCESS_POLICY_TOKEN
+      passwordKey: password
+      username: '1083092'
+      usernameKey: username
+    externalLabels: {}
+    host: https://mimir.thetmg.com
+    hostKey: host
+    processors:
+      batch:
+        maxSize: 0
+        size: 8192
+        timeout: 2s
+      memoryLimiter:
+        checkInterval: 1s
+        enabled: false
+        limit: 0MiB
+    protocol: remote_write
+    proxyURL: ''
+    queryEndpoint: /api/v1/query
+    secret:
+      create: true
+      name: ''
+      namespace: ''
+    sendNativeHistograms: false
+    tenantId: ''
+    tenantIdKey: tenantId
+    tls: {}
+    wal:
+      maxKeepaliveTime: 8h
+      minKeepaliveTime: 5m
+      truncateFrequency: 2h
+    writeEndpoint: /api/v1/push
+    writeRelabelConfigRules: ''
+  pyroscope:
+    authMode: basic
+    basicAuth:
+      password: ''
+      passwordKey: password
+      username: ''
+      usernameKey: username
+    externalLabels: {}
+    host: ''
+    hostKey: host
+    proxyURL: ''
+    secret:
+      create: true
+      name: ''
+      namespace: ''
+    tenantId: ''
+    tenantIdKey: tenantId
+    tls: {}
+  tempo:
+    authMode: basic
+    basicAuth:
+      password: ''
+      passwordKey: password
+      username: ''
+      usernameKey: username
+    host: ''
+    hostKey: host
+    protocol: otlp
+    searchEndpoint: /api/search
+    secret:
+      create: true
+      name: ''
+      namespace: ''
+    tenantId: ''
+    tenantIdKey: tenantId
+    tls: {}
+    tlsOptions: ''
+extraConfig: ''
+extraObjects: []
+global:
+  image:
+    pullSecrets: []
+    registry: ''
+  cattle:
+    systemProjectId: p-dkrnd
 kube-state-metrics:
   autosharding:
     enabled: false
@@ -188,6 +252,11 @@ logs:
     namespaces: []
   enabled: true
   extraConfig: ''
+  podLogsObjects:
+    enabled: false
+    extraStageBlocks: ''
+    namespaces: []
+    selector: ''
   pod_logs:
     annotation: k8s.grafana.com/logs.autogather
     discovery: all
@@ -199,13 +268,16 @@ logs:
   receiver:
     filters:
       log_record: []
+    transforms:
+      log: []
+      resource: []
 metrics:
-  agent:
+  alloy:
     enabled: true
     extraMetricRelabelingRules: ''
     extraRelabelingRules: ''
     labelMatchers:
-      app.kubernetes.io/name: grafana-agent.*
+      app.kubernetes.io/name: alloy.*
     metricsTuning:
       excludeMetrics: []
       includeMetrics: []
@@ -352,21 +424,28 @@ metrics:
     extraMetricRelabelingRules: ''
     namespaces: []
     scrapeInterval: ''
+    selector: ''
   probes:
     enabled: true
     extraMetricRelabelingRules: ''
     namespaces: []
     scrapeInterval: ''
+    selector: ''
   receiver:
     filters:
       datapoint: []
       metric: []
+    transforms:
+      datapoint: []
+      metric: []
+      resource: []
   scrapeInterval: 60s
   serviceMonitors:
     enabled: true
     extraMetricRelabelingRules: ''
     namespaces: []
     scrapeInterval: ''
+    selector: ''
   windows-exporter:
     enabled: false
     extraMetricRelabelingRules: ''
@@ -394,7 +473,7 @@ opencost:
     prometheus:
       external:
         enabled: true
-        url: https://mimir.yourdomain.com
+        url: https://mimir.thetmg.com
       internal:
         enabled: false
       password_key: password
@@ -402,6 +481,24 @@ opencost:
       username_key: username
     ui:
       enabled: false
+profiles:
+  ebpf:
+    demangle: none
+    enabled: true
+    extraRelabelingRules: ''
+    namespaces: []
+  enabled: false
+  pprof:
+    enabled: true
+    extraRelabelingRules: ''
+    namespaces: []
+    types:
+      - memory
+      - cpu
+      - goroutine
+      - block
+      - mutex
+      - fgprof
 prometheus-node-exporter:
   affinity:
     nodeAffinity:
@@ -465,8 +562,10 @@ receivers:
     port: 9411
 test:
   attempts: 10
+  enabled: true
   envOverrides:
     LOKI_URL: ''
+    PROFILECLI_URL: ''
     PROMETHEUS_URL: ''
     TEMPO_URL: ''
   extraAnnotations: {}
@@ -484,5 +583,9 @@ traces:
   enabled: false
   receiver:
     filters:
+      span: []
+      spanevent: []
+    transforms:
+      resource: []
       span: []
       spanevent: []
