@@ -7,7 +7,7 @@ The values.yaml posted here is built to work with Mimir and Loki On-Prem and not
 
 This read me will contain various snippets for OSS and Grafana Cloud
 
-# How to install the Kubernetes Monitoring Grafana Agent
+# How to install the Kubernetes Monitoring Grafana Alloy Agent
 
 # Mimir/Loki OSS - Metrics/Logs Only
 Replace "my-cluster" with youre cluster name
