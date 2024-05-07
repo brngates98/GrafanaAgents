@@ -1,0 +1,82 @@
+loki.process "logs_integrations_windows_exporter_application" {
+  forward_to = [loki.write.grafana_cloud_loki.receiver]
+
+  stage.json {
+    expressions = {
+      level  = "levelText",
+      source = "source",
+    }
+  }
+
+  stage.labels {
+    values = {
+      level  = "",
+      source = "",
+    }
+  }
+}
+loki.relabel "logs_integrations_windows_exporter_application" {
+  forward_to = [loki.process.logs_integrations_windows_exporter_application.receiver]
+
+  rule {
+    source_labels = ["computer"]
+    target_label  = "agent_hostname"
+  }
+}
+loki.source.windowsevent "logs_integrations_windows_exporter_application" {
+  locale                 = 1033
+  eventlog_name          = "Application"
+  bookmark_path          = "./bookmarks-app.xml"
+  poll_interval          = "0s"
+  use_incoming_timestamp = true
+  forward_to             = [loki.relabel.logs_integrations_windows_exporter_application.receiver]
+  labels                 = {
+    instance = constants.hostname,
+    job      = "integrations/windows_exporter",
+  }
+}
+loki.process "logs_integrations_windows_exporter_system" {
+  forward_to = [loki.write.grafana_cloud_loki.receiver]
+
+  stage.json {
+    expressions = {
+      level  = "levelText",
+      source = "source",
+    }
+  }
+
+  stage.labels {
+    values = {
+      level  = "",
+      source = "",
+    }
+  }
+}
+loki.relabel "logs_integrations_windows_exporter_system" {
+  forward_to = [loki.process.logs_integrations_windows_exporter_system.receiver]
+
+  rule {
+    source_labels = ["computer"]
+    target_label  = "agent_hostname"
+  }
+}
+loki.source.windowsevent "logs_integrations_windows_exporter_system" {
+  locale                 = 1033
+  eventlog_name          = "System"
+  bookmark_path          = "./bookmarks-sys.xml"
+  poll_interval          = "0s"
+  use_incoming_timestamp = true
+  forward_to             = [loki.relabel.logs_integrations_windows_exporter_system.receiver]
+  labels                 = {
+    instance = constants.hostname,
+    job      = "integrations/windows_exporter",
+  }
+}
+
+
+loki.write "grafana_cloud_loki" {
+  endpoint {
+    url = "https://logs/loki/api/v1/push"
+
+  }
+}
