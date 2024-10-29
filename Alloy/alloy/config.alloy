@@ -34,7 +34,7 @@
   
     loki.source.syslog "syslog" {
             listener {
-                    address      = "0.0.0.0:51893"
+                    address      = "0.0.0.0:601"
                     protocol     = "tcp"
                     idle_timeout = "0s"
                     use_rfc5424_message = true
@@ -42,7 +42,7 @@
                     max_message_length = 0
             }
             listener {
-                    address      = "0.0.0.0:51898"
+                    address      = "0.0.0.0:514"
                     protocol     = "udp"
                     idle_timeout = "0s"
                     use_rfc5424_message = true
