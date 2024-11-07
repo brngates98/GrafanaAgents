@@ -1,0 +1,58 @@
+prometheus.exporter.snmp "integrations_snmp" {
+    config_file = "/etc/snmp.yml"
+
+    target "Switch1" {
+        address = "192.168.30.31"
+        module  = "if_mib"
+        auth    = "private_v3"
+    }
+
+    target "Switch2" {
+        address = "192.168.30.29"
+        module  = "if_mib"
+        auth    = "private_v3"
+    }
+}
+
+discovery.relabel "integrations_snmp" {
+    targets = prometheus.exporter.snmp.integrations_snmp.targets
+
+    rule {
+        source_labels = ["job"]
+        regex         = "(^.*snmp)\\/(.*)"
+        target_label  = "job_snmp"
+    }
+
+    rule {
+        source_labels = ["job"]
+        regex         = "(^.*snmp)\\/(.*)"
+        target_label  = "snmp_target"
+        replacement   = "$2"
+    }
+
+    rule {
+        source_labels = ["instance"]
+        target_label  = "instance"
+        replacement   = "cisco_snmp_agent"
+    }
+}
+
+prometheus.scrape "integrations_snmp" {
+    scrape_timeout = "30s"
+    targets        = discovery.relabel.integrations_snmp.output
+    forward_to     = [prometheus.remote_write.integrations.receiver]
+    job_name       = "integrations/snmp"
+    clustering {
+        enabled = true
+    }
+}
+
+prometheus.remote_write "integrations" {
+    endpoint {
+        url = "https://mimir.thetmg.com/api/v1/push"
+
+        queue_config { }
+
+        metadata_config { }
+    }
+}
