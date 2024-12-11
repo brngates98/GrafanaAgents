@@ -1,0 +1,2144 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_MIMIR",
+      "label": "Mimir",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    },
+    {
+      "name": "DS_GRAFANACLOUD-DEMOINFRA-LOGS",
+      "label": "grafanacloud-demoinfra-logs",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "loki",
+      "pluginName": "Loki"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "11.5.0-80071"
+    },
+    {
+      "type": "datasource",
+      "id": "loki",
+      "name": "Loki",
+      "version": "1.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "${loki_datasource}"
+        },
+        "enable": true,
+        "expr": "{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", transport=\"kernel\", level=\"emerg\"}",
+        "hide": true,
+        "iconColor": "light-purple",
+        "name": "Critical system event",
+        "tagKeys": "cluster,job,instance,level",
+        "titleFormat": "Critical system event"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_MIMIR}"
+        },
+        "enable": true,
+        "expr": "changes(\nsum by (instance) (\n    group by (instance,release) (node_uname_info{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"})\n    )\n[$__interval:1m] offset -$__interval) > 1\n",
+        "hide": true,
+        "iconColor": "light-blue",
+        "name": "Kernel update",
+        "step": "5m",
+        "tagKeys": "cluster,job,instance",
+        "textFormat": "",
+        "titleFormat": "Kernel update"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "enable": true,
+        "expr": "increase(node_vmstat_oom_kill{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__interval])",
+        "hide": true,
+        "iconColor": "light-purple",
+        "name": "OOMkill",
+        "tagKeys": "cluster,job,instance",
+        "textFormat": "",
+        "titleFormat": "OOMkill"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_MIMIR}"
+        },
+        "enable": true,
+        "expr": "node_boot_time_seconds{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}*1000 > $__from < $__to",
+        "hide": true,
+        "iconColor": "light-yellow",
+        "name": "Reboot",
+        "tagKeys": "cluster,job,instance",
+        "titleFormat": "Reboot",
+        "useValueForTime": "on"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "${loki_datasource}"
+        },
+        "enable": true,
+        "expr": "{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", unit=\"init.scope\"} |= \"code=exited, status=1/FAILURE\"",
+        "hide": true,
+        "iconColor": "light-orange",
+        "name": "Service failed",
+        "tagKeys": "cluster,job,instance,level",
+        "titleFormat": "Service failed"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "${DS_GRAFANACLOUD-DEMOINFRA-LOGS}"
+        },
+        "enable": true,
+        "expr": "{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", unit=\"systemd-logind.service\"}|= \"New session\"",
+        "hide": true,
+        "name": "Session closed",
+        "tagKeys": "cluster,job,instance,level",
+        "titleFormat": "Session closed"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "${loki_datasource}"
+        },
+        "enable": true,
+        "expr": "{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", unit=\"systemd-logind.service\"}|= \"New session\"",
+        "hide": true,
+        "name": "Session opened",
+        "tagKeys": "cluster,job,instance,level",
+        "titleFormat": "Session opened"
+      }
+    ]
+  },
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [
+    {
+      "keepTime": true,
+      "title": "Back to Linux node / fleet",
+      "type": "link",
+      "url": "/d/node-fleet"
+    },
+    {
+      "keepTime": true,
+      "title": "Back to Linux node / overview",
+      "type": "link",
+      "url": "/d/nodes"
+    },
+    {
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "linux-node-integration"
+      ],
+      "title": "All Linux node /  dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "RAM (random-access memory) currently in use by the operating system and running applications, in percent.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "continuous-BlYlRd"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "100 -\n(\n  avg by (instance) (node_memory_MemAvailable_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}) /\n  avg by (instance) (node_memory_MemTotal_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"})\n* 100\n)\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Memory usage",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "- Used: The amount of physical memory currently in use by the system.\n- Cached: The amount of physical memory used for caching data from disk. The Linux kernel uses available memory to cache data that is read from or written to disk. This helps speed up disk access times.\n- Free: The amount of physical memory that is currently not in use.\n- Buffers: The amount of physical memory used for temporary storage of data being transferred between devices or applications.\n- Available: The amount of physical memory that is available for use by applications. This takes into account memory that is currently being used for caching but can be freed up if needed.\n",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Memory total",
+                  "Memory used"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 18,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "(\n  node_memory_MemTotal_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n-\n  node_memory_MemFree_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n-\n  node_memory_Buffers_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n-\n  node_memory_Cached_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n)\n",
+          "legendFormat": "Memory used",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_Cached_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Memory cached",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_MemAvailable_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Memory available",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_Buffers_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Memory buffers",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_MemFree_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Memory free",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_MemTotal_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Memory total",
+          "refId": "F"
+        }
+      ],
+      "title": "Memory usage",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 3,
+      "panels": [],
+      "title": "Vmstat",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Page-In - Return of pages to physical memory. This is a common and normal event.\n\nPage-Out - process of writing pages to disk. Unlike page-in, page-outs can indicate trouble.\nWhen the kernel detects low memory, it attempts to free memory by paging out. \nWhile occasional page-outs are normal, excessive and frequent page-outs can lead to thrashing.\nThrashing is a state in which the kernel spends more time managing paging activity than running applications, resulting in poor system performance.\n",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "out(-) | in(+)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/transmit|tx|out/"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 7
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "irate(node_vmstat_pgpgin{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "legendFormat": "Page-In",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "irate(node_vmstat_pgpgout{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "legendFormat": "Page-Out",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory pages in / out",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "Compared to the speed of the CPU and main memory, writing pages out to disk is relatively slow.\nNonetheless, it is a preferable option to crashing or killing off processes.\n\nThe process of writing pages out to disk to free memory is known as swapping-out.\nIf a page fault occurs because the page is on disk, in the swap area, rather than in memory,\nthe kernel will read the page back in from the disk to satisfy the page fault. \nThis is known as swapping-in.\n",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "out(-) | in(+)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/transmit|tx|out/"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 7
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "irate(node_vmstat_pswpin{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "legendFormat": "Pages swapped in",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "irate(node_vmstat_pswpout{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "legendFormat": "Pages swapped out",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory pages swapping in / out",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "A page fault is an exception raised by the memory when a process accesses a memory page without the necessary preparations,\nrequiring a mapping to be added to the process's virtual address space.\n\nThe page contents may also need to be loaded from a backing store such as a disk.\nWhile the MMU detects the page fault, the operating system's kernel handles the exception by either making the required page accessible in physical memory or denying an illegal memory access.\nValid page faults are common and necessary to increase memory availability in any operating system that uses virtual memory, including Windows, macOS, and the Linux kernel.\n",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 15
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "irate(node_vmstat_pgmajfault{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "legendFormat": "Major page fault operations",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "irate(node_vmstat_pgfault{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])\n-\nirate(node_vmstat_pgmajfault{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])\n",
+          "legendFormat": "Minor page fault operations",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory page faults",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "Out Of Memory killer is a process used by the Linux kernel when the system is running critically low on memory.\n\nThis can happen when the kernel has allocated more memory than is available for its processes.\n",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 15
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "increase(node_vmstat_oom_kill{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__interval])",
+          "legendFormat": "OOM killer invocations",
+          "refId": "A"
+        }
+      ],
+      "title": "OOM Killer",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 8,
+      "panels": [],
+      "title": "Memstat",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "- Inactive: Memory which has been less recently used. It is more eligible to be reclaimed for other purposes.\n- Active: Memory that has been used more recently and usually not reclaimed unless absolutely necessary.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_Active_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Active",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_Inactive_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Inactive",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory active / inactive",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "- Inactive_file: File-backed memory on inactive LRU list.\n- Inactive_anon: Anonymous and swap cache on inactive LRU list, including tmpfs (shmem).\n- Active_file: File-backed memory on active LRU list.\n- Active_anon: Anonymous and swap cache on active least-recently-used (LRU) list, including tmpfs.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_Inactive_file_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Inactive_file",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_Inactive_anon_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Inactive_anon",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_Active_file_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Active_file",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_Active_anon_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Active_anon",
+          "refId": "D"
+        }
+      ],
+      "title": "Memory active / inactive details",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "- Committed_AS - Amount of memory presently allocated on the system.\n- CommitLimit - Amount of memory currently available to be allocated on the system.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_Committed_AS_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Commited_AS",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_CommitLimit_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "CommitLimit",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory commited",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "- Mapped: This refers to the memory used in mapped page files that have been memory mapped, such as libraries.\n- Shmem: This is the memory used by shared memory, which is shared between multiple processes, including RAM disks.\n- ShmemHugePages: This is the memory used by shared memory and tmpfs allocated with huge pages.\n- ShmemPmdMapped: This is the amount of shared memory (shmem/tmpfs) backed by huge pages.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_Mapped_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Mapped",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_Shmem_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Shmem",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_ShmemPmdMapped_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "ShmemPmdMapped",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_ShmemHugePages_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "ShmemHugePages",
+          "refId": "D"
+        }
+      ],
+      "title": "Memory shared and mapped",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "- Writeback: This refers to the memory that is currently being actively written back to the disk.\n- WritebackTmp: This is the memory used by FUSE for temporary writeback buffers.\n- Dirty: This type of memory is waiting to be written back to the disk.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_Writeback_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Writeback",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_WritebackTmp_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "WritebackTmp",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_Dirty_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Dirty",
+          "refId": "C"
+        }
+      ],
+      "title": "Memory writeback and dirty",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "Virtual Memory Allocation is a type of memory allocation in Linux that allows a process to request a contiguous block of memory larger than the amount of physically available memory. This is achieved by mapping the requested memory to virtual addresses that are backed by a combination of physical memory and swap space on disk.\n\n- VmallocChunk: Largest contiguous block of vmalloc area which is free.\n- VmallocTotal: Total size of vmalloc memory area.\n- VmallocUsed: Amount of vmalloc area which is used.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_VmallocChunk_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "VmallocChunk",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_VmallocTotal_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "VmallocTotal",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_VmallocUsed_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "VmallocUsed",
+          "refId": "C"
+        }
+      ],
+      "title": "Memory Vmalloc",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "Slab Allocation is a type of memory allocation in Linux that allows the kernel to efficiently manage the allocation and deallocation of small and frequently used data structures, such as network packets, file system objects, and process descriptors.\n\nThe Slab Allocator maintains a cache of pre-allocated objects of a fixed size and type, called slabs. When an application requests an object of a particular size and type, the Slab Allocator checks if a pre-allocated object of that size and type is available in the cache. If an object is available, it is returned to the application; if not, a new slab of objects is allocated and added to the cache.\n\n- SUnreclaim: Part of Slab, that cannot be reclaimed on memory pressure.\n- SReclaimable: Part of Slab, that might be reclaimed, such as caches.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_SUnreclaim_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "SUnreclaim",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_SReclaimable_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "SReclaimable",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory slab",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Memory Anonymous refers to the portion of the virtual memory that is used by a process for dynamically allocated memory that is not backed by any file or device.\n\nThis type of memory is commonly used for heap memory allocation, which is used by programs to allocate and free memory dynamically during runtime.\n\nMemory Anonymous is different from Memory Mapped files, which refer to portions of the virtual memory space that are backed by a file or device,\nand from Memory Shared with other processes,\nwhich refers to memory regions that can be accessed and modified by multiple processes.\n\n- AnonHugePages: Memory in anonymous huge pages.\n- AnonPages: Memory in user pages not backed by files.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_AnonHugePages_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "AnonHugePages",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_AnonPages_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "AnonPages",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory slab",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "Huge Pages are a feature that allows for the allocation of larger memory pages than the standard 4KB page size. By using larger page sizes, the kernel can reduce the overhead associated with managing a large number of smaller pages, which can improve system performance for certain workloads.\n\n- HugePages_Free: Huge pages in the pool that are not yet allocated.\n- HugePages_Rsvd: Huge pages for which a commitment to allocate from the pool has been made, but no allocation has yet been made.\n- HugePages_Surp: Huge pages in the pool above the value in /proc/sys/vm/nr_hugepages.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 56
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_HugePages_Free{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "HugePages_Free",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_HugePages_Rsvd{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "HugePages_Rsvd",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_HugePages_Surp{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "HugePages_Surp",
+          "refId": "C"
+        }
+      ],
+      "title": "Memory HugePages counter",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_MIMIR}"
+      },
+      "description": "Huge Pages are a feature that allows for the allocation of larger memory pages than the standard 4KB page size. By using larger page sizes, the kernel can reduce the overhead associated with managing a large number of smaller pages, which can improve system performance for certain workloads.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 56
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_HugePages_Total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Huge pages total size",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_Hugepagesize_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Huge page size",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory HugePages size",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Direct Map memory refers to the portion of the kernel's virtual address space that is directly mapped to physical memory. This mapping is set up by the kernel during boot time and is used to provide fast access to certain critical kernel data structures, such as page tables and interrupt descriptor tables.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 64
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_DirectMap1G_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "DirectMap1G",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_memory_DirectMap2M_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "DirectMap2M",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_DirectMap4k_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "DirectMap4k",
+          "refId": "C"
+        }
+      ],
+      "title": "Memory direct map",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Memory bounce is a technique used in the Linux kernel to handle situations where direct memory access (DMA) is required but the physical memory being accessed is not contiguous. This can happen when a device, such as a network interface card or a disk controller, requires access to a large amount of memory that is not available as a single contiguous block.\n\nTo handle this situation, the kernel uses a technique called memory bouncing. In memory bouncing, the kernel sets up a temporary buffer in physical memory that is large enough to hold the entire data block being transferred by the device. The data is then copied from the non-contiguous source memory to the temporary buffer, which is physically contiguous.\n\n- Bounce: Memory used for block device bounce buffers.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "min": 0,
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*(T|t)otal.*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 64
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_MIMIR}"
+          },
+          "expr": "node_memory_Bounce_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Bounce",
+          "refId": "A"
+        }
+      ],
+      "title": "Memory bounce",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 40,
+  "tags": [
+    "linux-node-integration"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "label": "Data source",
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "(?!grafanacloud-usage|grafanacloud-ml-metrics).+",
+        "type": "datasource"
+      },
+      {
+        "allValue": ".*",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "includeAll": true,
+        "label": "Cluster",
+        "multi": true,
+        "name": "cluster",
+        "options": [],
+        "query": "label_values(node_uname_info{job=~\"integrations/(node_exporter|unix)\"}, cluster)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".+",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_MIMIR}"
+        },
+        "includeAll": true,
+        "label": "Job",
+        "multi": true,
+        "name": "job",
+        "options": [],
+        "query": "label_values(node_uname_info{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\"}, job)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".+",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "includeAll": false,
+        "label": "Instance",
+        "name": "instance",
+        "options": [],
+        "query": "label_values(node_uname_info{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\"}, instance)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "hide": 2,
+        "label": "Loki data source",
+        "name": "loki_datasource",
+        "options": [],
+        "query": "loki",
+        "refresh": 1,
+        "regex": "(?!grafanacloud.+usage-insights|grafanacloud.+alert-state-history).+",
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "default",
+  "title": "Linux node / memory",
+  "uid": "node-memory",
+  "version": 1,
+  "weekStart": ""
+}

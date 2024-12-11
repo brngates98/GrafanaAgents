@@ -1,0 +1,1366 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_GRAFANACLOUD-DEMOINFRA-PROM",
+      "label": "grafanacloud-demoinfra-prom",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    },
+    {
+      "name": "DS_GRAFANACLOUD-DEMOINFRA-LOGS",
+      "label": "grafanacloud-demoinfra-logs",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "loki",
+      "pluginName": "Loki"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "11.5.0-80071"
+    },
+    {
+      "type": "datasource",
+      "id": "loki",
+      "name": "Loki",
+      "version": "1.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "${loki_datasource}"
+        },
+        "enable": true,
+        "expr": "{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", transport=\"kernel\", level=\"emerg\"}",
+        "hide": true,
+        "iconColor": "light-purple",
+        "name": "Critical system event",
+        "tagKeys": "cluster,job,instance,level",
+        "titleFormat": "Critical system event"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+        },
+        "enable": true,
+        "expr": "changes(\nsum by (instance) (\n    group by (instance,release) (node_uname_info{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"})\n    )\n[$__interval:1m] offset -$__interval) > 1\n",
+        "hide": true,
+        "iconColor": "light-blue",
+        "name": "Kernel update",
+        "step": "5m",
+        "tagKeys": "cluster,job,instance",
+        "textFormat": "",
+        "titleFormat": "Kernel update"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "enable": true,
+        "expr": "increase(node_vmstat_oom_kill{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__interval])",
+        "hide": true,
+        "iconColor": "light-purple",
+        "name": "OOMkill",
+        "tagKeys": "cluster,job,instance",
+        "textFormat": "",
+        "titleFormat": "OOMkill"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+        },
+        "enable": true,
+        "expr": "node_boot_time_seconds{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}*1000 > $__from < $__to",
+        "hide": true,
+        "iconColor": "light-yellow",
+        "name": "Reboot",
+        "tagKeys": "cluster,job,instance",
+        "titleFormat": "Reboot",
+        "useValueForTime": "on"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "${loki_datasource}"
+        },
+        "enable": true,
+        "expr": "{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", unit=\"init.scope\"} |= \"code=exited, status=1/FAILURE\"",
+        "hide": true,
+        "iconColor": "light-orange",
+        "name": "Service failed",
+        "tagKeys": "cluster,job,instance,level",
+        "titleFormat": "Service failed"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "${DS_GRAFANACLOUD-DEMOINFRA-LOGS}"
+        },
+        "enable": true,
+        "expr": "{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", unit=\"systemd-logind.service\"}|= \"New session\"",
+        "hide": true,
+        "name": "Session closed",
+        "tagKeys": "cluster,job,instance,level",
+        "titleFormat": "Session closed"
+      },
+      {
+        "datasource": {
+          "type": "loki",
+          "uid": "${loki_datasource}"
+        },
+        "enable": true,
+        "expr": "{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", unit=\"systemd-logind.service\"}|= \"New session\"",
+        "hide": true,
+        "name": "Session opened",
+        "tagKeys": "cluster,job,instance,level",
+        "titleFormat": "Session opened"
+      }
+    ]
+  },
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [
+    {
+      "keepTime": true,
+      "title": "Back to Linux node / fleet",
+      "type": "link",
+      "url": "/d/node-fleet"
+    },
+    {
+      "keepTime": true,
+      "title": "Back to Linux node / overview",
+      "type": "link",
+      "url": "/d/nodes"
+    },
+    {
+      "asDropdown": true,
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "linux-node-integration"
+      ],
+      "title": "All Linux node /  dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Filesystem",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+      },
+      "description": "Filesystem space utilisation in bytes, by mountpoint.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 1,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_filesystem_avail_bytes{fstype!=\"\", mountpoint!=\"\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "{{ mountpoint }} free",
+          "refId": "A"
+        }
+      ],
+      "title": "Filesystem space availabe",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+      },
+      "description": "Disk utilisation in percent, by mountpoint. Some duplication can occur if the same filesystem is mounted in multiple locations.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-blue",
+                "value": null
+              },
+              {
+                "color": "light-yellow",
+                "value": 0.8
+              },
+              {
+                "color": "light-red",
+                "value": 0.9
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mounted on"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": "260"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Size"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": "80"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Used"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": "80"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Available"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": "80"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Used, %"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "max",
+                "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_filesystem_size_bytes{fstype!=\"\", mountpoint!=\"\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "TOTAL"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+          },
+          "expr": "node_filesystem_avail_bytes{fstype!=\"\", mountpoint!=\"\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{ mountpoint }} free",
+          "refId": "FREE"
+        }
+      ],
+      "title": "Disk space usage",
+      "transformations": [
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Value #FREE": {
+                "aggregations": [
+                  "lastNotNull"
+                ],
+                "operation": "aggregate"
+              },
+              "Value #TOTAL": {
+                "aggregations": [
+                  "lastNotNull"
+                ],
+                "operation": "aggregate"
+              },
+              "mountpoint": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Used",
+            "binary": {
+              "left": "Value #TOTAL (lastNotNull)",
+              "operator": "-",
+              "reducer": "sum",
+              "right": "Value #FREE (lastNotNull)"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Used, %",
+            "binary": {
+              "left": "Used",
+              "operator": "/",
+              "reducer": "sum",
+              "right": "Value #TOTAL (lastNotNull)"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "Used": 3,
+              "Used, %": 4,
+              "Value #FREE (lastNotNull)": 2,
+              "Value #TOTAL (lastNotNull)": 1,
+              "mountpoint": 0
+            },
+            "renameByName": {
+              "Value #FREE (lastNotNull)": "Available",
+              "Value #TOTAL (lastNotNull)": "Size",
+              "mountpoint": "Mounted on"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": false,
+                "field": "Mounted on"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "The inode is a data structure in a Unix-style file system that describes a file-system object such as a file or a directory.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 1,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+          },
+          "expr": "node_filesystem_files_free{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", fstype!=\"\", mountpoint!=\"\"}",
+          "legendFormat": "{{ mountpoint }} inodes free",
+          "refId": "A"
+        }
+      ],
+      "title": "Free inodes",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "The inode is a data structure in a Unix-style file system that describes a file-system object such as a file or a directory.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 1,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+          },
+          "expr": "node_filesystem_files{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", fstype!=\"\", mountpoint!=\"\"}",
+          "legendFormat": "{{ mountpoint }} inodes total",
+          "refId": "A"
+        }
+      ],
+      "title": "Total inodes",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 1,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+          },
+          "expr": "node_filesystem_device_error{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", fstype!=\"\", mountpoint!=\"\"}",
+          "legendFormat": "{{ mountpoint }} device error",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "node_filesystem_readonly{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", fstype!=\"\", mountpoint!=\"\"}",
+          "legendFormat": "{{ mountpoint }} read-only",
+          "refId": "B"
+        }
+      ],
+      "title": "Filesystems with errors / read-only",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+      },
+      "description": "File descriptor is a handle to an open file or input/output (I/O) resource, such as a network socket or a pipe.\nThe operating system uses file descriptors to keep track of open files and I/O resources, and provides a way for programs to read from and write to them.\n",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 1,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "11.5.0-80071",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "process_max_fds{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Maximum open file descriptors",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+          },
+          "expr": "process_open_fds{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "legendFormat": "Open file descriptors",
+          "refId": "B"
+        }
+      ],
+      "title": "File descriptors",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 8,
+      "panels": [],
+      "title": "Disk",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Disk read/writes in bytes per second.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 1,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "Bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/time|used|busy|util/"
+            },
+            "properties": [
+              {
+                "id": "custom.axisSoftMax",
+                "value": 100
+              },
+              {
+                "id": "custom.drawStyle",
+                "value": "points"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 26
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+          },
+          "expr": "irate(node_disk_read_bytes_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])",
+          "legendFormat": "{{ device }} read",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "irate(node_disk_written_bytes_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])",
+          "legendFormat": "{{ device }} written",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+          },
+          "expr": "irate(node_disk_io_time_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])",
+          "legendFormat": "{{ device }} io util",
+          "refId": "C"
+        }
+      ],
+      "title": "Disk reads/writes",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "The number of I/O requests per second for the device/volume.\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisCenteredZero": true,
+            "axisLabel": "write(-) | read(+)",
+            "fillOpacity": 1,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "iops"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/write|written/"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 26
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+          },
+          "expr": "irate(node_disk_reads_completed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n",
+          "legendFormat": "{{ device }} reads",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "irate(node_disk_writes_completed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n",
+          "legendFormat": "{{ device }} writes",
+          "refId": "B"
+        }
+      ],
+      "title": "Disk I/O",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+      },
+      "description": "The average time for requests issued to the device to be served.\nThis includes the time spent by the requests in queue and the time spent servicing them.'\n",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisCenteredZero": true,
+            "axisLabel": "write(-) | read(+)",
+            "fillOpacity": 1,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/write|written/"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 34
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "irate(node_disk_read_time_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n/\nirate(node_disk_reads_completed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n",
+          "legendFormat": "{{ device }} avg read time",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+          },
+          "expr": "irate(node_disk_write_time_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n/\nirate(node_disk_writes_completed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n",
+          "legendFormat": "{{ device }} avg write time",
+          "refId": "B"
+        }
+      ],
+      "title": "Disk average wait time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Disk average IO queue.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisCenteredZero": true,
+            "axisLabel": "write(-) | read(+)",
+            "fillOpacity": 1,
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/write|written/"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 34
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "v11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+          },
+          "expr": "irate(node_disk_io_time_weighted_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])",
+          "legendFormat": "{{ device }} avg queue",
+          "refId": "A"
+        }
+      ],
+      "title": "Disk average queue",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 40,
+  "tags": [
+    "linux-node-integration"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "label": "Data source",
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "(?!grafanacloud-usage|grafanacloud-ml-metrics).+",
+        "type": "datasource"
+      },
+      {
+        "allValue": ".*",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "includeAll": true,
+        "label": "Cluster",
+        "multi": true,
+        "name": "cluster",
+        "options": [],
+        "query": "label_values(node_uname_info{job=~\"integrations/(node_exporter|unix)\"}, cluster)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".+",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_GRAFANACLOUD-DEMOINFRA-PROM}"
+        },
+        "includeAll": true,
+        "label": "Job",
+        "multi": true,
+        "name": "job",
+        "options": [],
+        "query": "label_values(node_uname_info{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\"}, job)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".+",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "includeAll": false,
+        "label": "Instance",
+        "name": "instance",
+        "options": [],
+        "query": "label_values(node_uname_info{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\"}, instance)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "hide": 2,
+        "label": "Loki data source",
+        "name": "loki_datasource",
+        "options": [],
+        "query": "loki",
+        "refresh": 1,
+        "regex": "(?!grafanacloud.+usage-insights|grafanacloud.+alert-state-history).+",
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "default",
+  "title": "Linux node / filesystem and disks",
+  "uid": "node-disk",
+  "version": 1,
+  "weekStart": ""
+}
